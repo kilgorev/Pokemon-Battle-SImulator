@@ -1,0 +1,334 @@
+# Pokemon Project
+
+My career that I hope to go into after graduating college is Game Development. This is why I am studying computer science! My favorite game is Pokemon. I have looked into Pokemon and stats before by watching YouTube videos, but I never considered that I could figure things out about the game on my own! I also really enjoy web design so I want to use my passions and hobbies to create something I would love to share.
+
+## How my Simulator Works
+A user opens up the shiny app and selects 2 pokemon they want to have battle. Then they press a battle button. Behind the scenes, after they click that button an equation is done for both pokemon to decide which one will win. There is a determined score for both pokemon we get by dividing the attack by the pokemon's against_type column for the type of pokemon it is against (eg. a water and fire pokemon, the fire pokemon will take the number from the against_water column and the water pokemon will take it's number from against_fire column) then adding the HP, defense, and speed. There scores will be compared, and the pokemon with the better score will be determined the winner. A message will output (eg "Pikachu Wins!"). I used the same function but changed the output to have the Pokemon's images output. There are alse 2 stat bars that will output depending on the pokemon chosen.
+
+## Setup
+
+### Reading in Packages
+
+### Reading in the CSV
+
+```{r}
+library(readr)
+
+pokemon <- read_csv("pokemon.csv")
+
+library(tidyverse)
+library(tibble)
+library(ggpubr)
+library(dplyr)
+library(tidyr)
+library(rvest)
+```
+
+### Inspecting Data
+
+```{r}
+head(pokemon)
+ls(pokemon)
+```
+
+### Reading HTML to get Images
+
+```{r}
+pokemon_html <- read_html('https://bulbapedia.bulbagarden.net/wiki/List_of_Pok%C3%A9mon_by_National_Pok%C3%A9dex_number')
+```
+
+```{r}
+pokemon_images <- pokemon_html %>% html_elements("tbody")
+```
+
+```{r}
+pokemon_images <- pokemon_images %>% html_elements("tr") %>% html_elements("td") %>% html_elements("a") %>%  html_element("img") %>%
+  html_attr("src")
+```
+
+```{r}
+pokemon_images <- na.omit(pokemon_images)
+```
+
+### Filtering Images
+
+I needed a certain types and this was the best way to get rid of useless PNGs
+This ended up being redundant and it took forever. I found out I can just source the images in the files of the cloud.
+
+```{r}
+pokemon_images <- data.frame(pokemon_images ) %>%  filter_all(any_vars(!str_detect(., "HOME")))
+
+pokemon_images <- data.frame(pokemon_images ) %>%  filter_all(any_vars(!str_detect(., "Alola")))
+
+pokemon_images <- data.frame(pokemon_images ) %>%  filter_all(any_vars(!str_detect(., "Galar")))
+
+pokemon_images <- data.frame(pokemon_images ) %>%  filter_all(any_vars(!str_detect(., "Hisui")))
+
+pokemon_images <- data.frame(pokemon_images ) %>%  filter_all(any_vars(!str_detect(., "Paldea")))
+
+pokemon_images <- data.frame(pokemon_images ) %>%  filter_all(any_vars(!str_detect(., "Castform-S")))
+
+pokemon_images <- data.frame(pokemon_images ) %>%  filter_all(any_vars(!str_detect(., "West")))
+pokemon_images <- data.frame(pokemon_images ) %>%  filter_all(any_vars(!str_detect(., "-Rainy"))) %>%  filter_all(any_vars(!str_detect(., "-Defense"))) %>%  filter_all(any_vars(!str_detect(., "-Speed")))
+
+pokemon_images <- data.frame(pokemon_images ) %>%  filter_all(any_vars(!str_detect(., "-Sandy")))
+pokemon_images <- data.frame(pokemon_images ) %>%  filter_all(any_vars(!str_detect(., "-Trash")))
+
+pokemon_images <- data.frame(pokemon_images ) %>%  filter_all(any_vars(!str_detect(., "-Sunshine")))
+
+pokemon_images <- data.frame(pokemon_images ) %>%  filter_all(any_vars(!str_detect(., "-Heat"))) %>%  filter_all(any_vars(!str_detect(., "-Wash"))) %>%  filter_all(any_vars(!str_detect(., "-Frost"))) %>% filter_all(any_vars(!str_detect(., "-Fan"))) %>%  filter_all(any_vars(!str_detect(., "-Mow")))
+
+pokemon_images <- data.frame(pokemon_images ) %>% filter_all(any_vars(!str_detect(., "-Origin"))) %>% filter_all(any_vars(!str_detect(., "-Sky"))) %>% filter_all(any_vars(!str_detect(.,"-Blue"))) %>% filter_all(any_vars(!str_detect(., "-Red"))) %>% filter_all(any_vars(!str_detect(., "-Zen"))) %>% filter_all(any_vars(!str_detect(., "-Summer"))) %>% filter_all(any_vars(!str_detect(., "-Autumn"))) %>% filter_all(any_vars(!str_detect(., "-Winter"))) %>% filter_all(any_vars(!str_detect(., "-Therian"))) %>% filter_all(any_vars(!str_detect(., "-Black"))) %>% filter_all(any_vars(!str_detect(., "-Resolute")))
+
+pokemon_images <- data.frame(pokemon_images ) %>% filter_all(any_vars(!str_detect(., "Kyurem-White"))) %>% filter_all(any_vars(!str_detect(., "-Attack"))) %>% filter_all(any_vars(!str_detect(., "-Pirouette"))) %>% filter_all(any_vars(!str_detect(., "-Pirouette"))) %>% filter_all(any_vars(!str_detect(., "Meowstic-Female.png"))) %>% filter_all(any_vars(!str_detect(., "-10Percent"))) %>% filter_all(any_vars(!str_detect(., "-Shield"))) %>% filter_all(any_vars(!str_detect(., "-Complete"))) %>% filter_all(any_vars(!str_detect(., "-Unbound"))) %>% filter_all(any_vars(!str_detect(., "Oricorio-Pom-Pom."))) %>% filter_all(any_vars(!str_detect(., "Oricorio-Pa"))) %>% filter_all(any_vars(!str_detect(., "-Sensu"))) %>% filter_all(any_vars(!str_detect(., "c-Midnight"))) %>% filter_all(any_vars(!str_detect(., "c-Dusk"))) %>% filter_all(any_vars(!str_detect(., "-School")))
+
+pokemon_images <- data.frame(pokemon_images ) %>%  filter_all(any_vars(!str_detect(., "-Core"))) %>% filter_all(any_vars(!str_detect(., "-Dusk_Mane"))) %>% filter_all(any_vars(!str_detect(., "-Dawn"))) %>% filter_all(any_vars(!str_detect(., "-Gulping")))  %>% filter_all(any_vars(!str_detect(., "-Gorging"))) %>% filter_all(any_vars(!str_detect(., "-Amped"))) %>% filter_all(any_vars(!str_detect(., "-Noice"))) %>% filter_all(any_vars(!str_detect(., "-Indeedee-Female"))) %>% filter_all(any_vars(!str_detect(., "-Hangry")))       
+```
+
+### Cleaning up
+
+```{r}
+pokemon_images <- pokemon_images[1:801, ]
+```
+
+```{r}
+pokemon_images <- gsub("//archives", "archives", pokemon_images)
+```
+
+### Adding Images to dataset
+
+```{r}
+pokemon <- pokemon %>% mutate(pokemon_images)
+```
+
+## Fixing image file names
+```{r}
+# Set the working directory to the directory containing the files
+setwd("pokemon_battle_sim/pokemon_images/all/")
+
+# List all files in the directory
+files <- list.files(pattern = ".jpg")
+
+# Loop through each JPG file and rename it to PNG
+for (file in files) {
+  new_file <- gsub(".jpg", ".png", file)
+  file.rename(file, new_file)
+}
+
+# Print a message indicating the conversion is done
+print("All JPG files have been converted to PNG.")
+```
+
+## Installing packages for Shiny
+```{r}
+# install.packages("remotes")
+# 
+# # Install using the remotes package
+# remotes::install_github("rstudio/shinyuieditor")
+
+```
+
+```{r}
+# launch_editor(
+#     app_loc = "app.R")
+```
+
+## Changing type names to help algorithm
+```{r}
+pokemon <- pokemon %>%
+  mutate(type1 = if_else(type1 == "fighting", "fight", type1))
+pokemon <- pokemon %>%
+  mutate(type2 = if_else(type2 == "fighting", "fight", type2))
+```
+
+
+## Coding the Algorithm
+We need to have an algorithm that decides what pokemon shows up based on it's attack and how good a pokemon is against another
+```{r}
+battle <- function(pokemon1, pokemon2) {
+  pokemon1data <- pokemon %>% filter(name == pokemon1)
+  pokemon2data <- pokemon %>% filter(name == pokemon2)
+
+  ## Create definitions for against_column
+  pokemon1_against_column <- paste0("against_", pokemon2data$type1)
+  pokemon2_against_column <- paste0("against_", pokemon1data$type1)
+  
+  if (!is.na(pokemon2data$type2)) {
+    pokemon1_against_column2 <- paste0("against_", pokemon2data$type2)
+  } else {
+    pokemon1_against_column2 <- "against_NA"
+  }
+  
+  if (!is.na(pokemon1data$type2)) {
+    pokemon2_against_column2 <- paste0("against_", pokemon1data$type2)
+  } else {
+    pokemon2_against_column2 <- "against_NA"
+  }
+
+  ## Create pokemon1 and pokemon2 scores
+  ## pokemon1
+  pokemon1attack <- pokemon1data$attack
+  pokemon1hp <- pokemon1data$hp
+  pokemon1speed <- pokemon1data$speed
+  pokemon1defense <- pokemon1data$defense
+  
+  if (pokemon1_against_column2 == "against_NA") {
+    pokemon1score <- (pokemon1attack / pokemon1data[[pokemon1_against_column]]) +
+      pokemon1hp +
+      pokemon1speed +
+      pokemon1defense
+  } else {
+    pokemon1score <- (pokemon1attack / (pokemon1data[[pokemon1_against_column]] + pokemon1data[[pokemon1_against_column2]])) + 
+      pokemon1hp +
+      pokemon1speed +
+      pokemon1defense
+  }
+  
+  ## pokemon2
+  pokemon2attack <- pokemon2data$attack
+  pokemon2hp <- pokemon2data$hp
+  pokemon2speed <- pokemon2data$speed
+  pokemon2defense <- pokemon2data$defense
+  
+  if (pokemon2_against_column2 == "against_NA") {
+    pokemon2score <- (pokemon2attack / pokemon2data[[pokemon2_against_column]]) + 
+      pokemon2hp +
+      pokemon2speed +
+      pokemon2defense
+  } else {
+    pokemon2score <- (pokemon2attack / (pokemon2data[[pokemon2_against_column]] + pokemon2data[[pokemon2_against_column2]])) + 
+      pokemon2hp +
+      pokemon2speed +
+      pokemon2defense
+  }
+  
+
+if(pokemon2score > pokemon1score){
+
+  return(paste(pokemon2data$name, " Wins!"))
+
+} else if(pokemon1score > pokemon2score){
+
+  return(paste(pokemon1data$name, " Wins!"))
+
+} else{
+  return("DRAW")
+}
+}
+```
+
+## Testing function // squirtle wins!
+```{r}
+
+battle('Squirtle', 'Charmander')
+
+```
+
+## Testing function // Venusaur wins!
+```{r}
+
+battle('Venusaur', 'Machop')
+
+```
+## Writing the function for an image to pop-up
+```{r}
+battlePic <- function(pokemon1, pokemon2) {
+  pokemon1data <- pokemon %>% filter(name == pokemon1)
+  pokemon2data <- pokemon %>% filter(name == pokemon2)
+
+  ## Create definitions for against_column
+  pokemon1_against_column <- paste0("against_", pokemon2data$type1)
+  pokemon2_against_column <- paste0("against_", pokemon1data$type1)
+  
+  if (!is.na(pokemon2data$type2)) {
+    pokemon1_against_column2 <- paste0("against_", pokemon2data$type2)
+  } else {
+    pokemon1_against_column2 <- "against_NA"
+  }
+  
+  if (!is.na(pokemon1data$type2)) {
+    pokemon2_against_column2 <- paste0("against_", pokemon1data$type2)
+  } else {
+    pokemon2_against_column2 <- "against_NA"
+  }
+
+  ## Create pokemon1 and pokemon2 scores
+  ## pokemon1
+  pokemon1attack <- pokemon1data$attack
+  pokemon1hp <- pokemon1data$hp
+  pokemon1speed <- pokemon1data$speed
+  pokemon1defense <- pokemon1data$defense
+  
+  if (pokemon1_against_column2 == "against_NA") {
+    pokemon1score <- (pokemon1attack / pokemon1data[[pokemon1_against_column]]) +
+      pokemon1hp +
+      pokemon1speed +
+      pokemon1defense
+  } else {
+    pokemon1score <- (pokemon1attack / (pokemon1data[[pokemon1_against_column]] + pokemon1data[[pokemon1_against_column2]])) + 
+      pokemon1hp +
+      pokemon1speed +
+      pokemon1defense
+  }
+  
+  ## pokemon2
+  pokemon2attack <- pokemon2data$attack
+  pokemon2hp <- pokemon2data$hp
+  pokemon2speed <- pokemon2data$speed
+  pokemon2defense <- pokemon2data$defense
+  
+  if (pokemon2_against_column2 == "against_NA") {
+    pokemon2score <- (pokemon2attack / pokemon2data[[pokemon2_against_column]]) + 
+      pokemon2hp +
+      pokemon2speed +
+      pokemon2defense
+  } else {
+    pokemon2score <- (pokemon2attack / (pokemon2data[[pokemon2_against_column]] + pokemon2data[[pokemon2_against_column2]])) + 
+      pokemon2hp +
+      pokemon2speed +
+      pokemon2defense
+  }
+  
+
+if(pokemon2score > pokemon1score){
+
+  return(paste0("pokemon_images/all/", tolower(pokemon2), ".png"))
+
+} else if(pokemon1score > pokemon2score){
+
+  return(paste0("pokemon_images/all/", tolower(pokemon1), ".png"))
+
+} else{
+  return('pokemon_images/all/pokeball.png')
+}
+}
+```
+
+
+## Testing my image function
+```{r}
+  battlePic('Venusaur', 'Machop')
+```
+
+## Stats Bar Functionality
+```{r}
+stats <- function(pokemon_name){
+  pokemonData <- pokemon %>% filter(name == pokemon_name)
+  
+  ### stats data
+  pokemonAttack <- pokemonData$attack
+  pokemonHP <- pokemonData$hp
+  pokemonDefense <- pokemonData$defense
+  pokemonSpeed <- pokemonData$speed
+  
+  return(
+    data.frame(
+      "Area" = c("Attack", "Defense", "Speed", "HP"),
+      "Stats" = c(pokemonAttack,
+                       pokemonDefense,
+                       pokemonSpeed,
+                       pokemonHP)
+    )
+  )
+}
+```
